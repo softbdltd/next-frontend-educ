@@ -1,0 +1,172 @@
+import {Card, CardContent, CardHeader, Typography} from '@mui/material';
+import React, {useCallback, useEffect, useState, useMemo} from 'react';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import {styled} from '@mui/material/styles';
+import {Box} from '@mui/system';
+import {useIntl} from 'react-intl';
+import CustomFilterableSelect from '../../learner/training/components/CustomFilterableSelect';
+import {useFetchDashboardYearlyEnrollments} from '../../../services/global/hooks';
+import {
+  generateOfYears,
+  localizedNumbers,
+} from '../../../@core/utilities/helpers';
+import NoDataFoundComponent from '../../learner/common/NoDataFoundComponent';
+
+const StyledBox = styled(Box)(({theme}) => ({
+  [`& .MuiCardHeader-title`]: {
+    fontSize: '1.4rem',
+    [theme.breakpoints.up('xs')]: {
+      fontSize: '1.2rem',
+    },
+    [theme.breakpoints.up('sm')]: {
+      fontSize: '1.3rem',
+    },
+    [theme.breakpoints.up('md')]: {
+      fontSize: '1.4rem',
+    },
+    [theme.breakpoints.up('lg')]: {
+      fontSize: '1.6rem',
+    },
+    color: '#000',
+    fontWeight: 400,
+  },
+}));
+
+const CourseEnrolmentChart = () => {
+  const {messages, formatDate, locale} = useIntl();
+
+  const barChartSize: number = 18;
+
+  const [chartData, setChartData] = useState<any>([]);
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear(),
+  );
+
+  const [statisticsParams, setStatisticsParams] = useState<any>({
+    year: new Date().getFullYear(),
+  });
+
+  const {data: statisticsData} =
+    useFetchDashboardYearlyEnrollments(statisticsParams);
+
+  const onChangeYear = useCallback(
+    (year: string) => {
+      if (year && Number(year) !== selectedYear) {
+        setSelectedYear(Number(year));
+        setStatisticsParams({year});
+      }
+    },
+    [selectedYear],
+  );
+
+  const listOfYears = useMemo(() => generateOfYears(locale), [locale]);
+
+  const formatDateOfMonthLocalized = (monthId: number, short?: boolean) => {
+    const today = new Date();
+    today.setMonth(monthId);
+    if (short) {
+      return locale === 'en-US'
+        ? formatDate(today, {month: 'long'}).substring(0, 3)
+        : formatDate(today, {month: 'long'}).substring(0, 5);
+    }
+
+    return formatDate(today, {month: 'long'});
+  };
+
+  useEffect(() => {
+    if (statisticsData) {
+      let stateData: any = [];
+      statisticsData.map((data: any) => {
+        data.yAxisName = formatDateOfMonthLocalized(data.month - 1);
+        stateData.push(data);
+      });
+      setChartData(stateData);
+    }
+  }, [statisticsData, locale]);
+
+  const CustomTooltip = ({payload, active}: any) => {
+    if (active && payload && payload.length) {
+      const {payload: data} = payload[0];
+      return (
+        <Card>
+          <CardContent>
+            <Typography>{`${formatDateOfMonthLocalized(
+              data.month - 1,
+            )}`}</Typography>
+            <Typography>
+              {messages['dashboard.Enrolments']}:{' '}
+              {`${localizedNumbers(data.enrollments, locale)}`}
+            </Typography>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <StyledBox>
+      <Card>
+        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+          <CardHeader title={messages['dashboard.TotalEnrolments']} />
+
+          <Box sx={{width: '50%', paddingRight: '10px', marginTop: '10px'}}>
+            <CustomFilterableSelect
+              id={'demo-year-select'}
+              label={messages['dashboard.Year']}
+              isLoading={false}
+              options={listOfYears || []}
+              optionValueProp={'key'}
+              optionTitleProp={['label']}
+              defaultValue={selectedYear ?? ''}
+              onChange={(value: any) => onChangeYear(value)}
+            />
+          </Box>
+        </div>
+        <CardContent>
+          <ResponsiveContainer width={'100%'} height={300}>
+            {chartData?.length > 0 ? (
+              <BarChart
+                width={100}
+                height={300}
+                barSize={barChartSize}
+                data={chartData}
+                layout={'horizontal'}
+                margin={{
+                  top: 0,
+                  right: 0,
+                  left: -20,
+                  bottom: 40,
+                }}>
+                <CartesianGrid strokeDasharray='3 3' />
+                <YAxis type='number' />
+                <XAxis
+                  type='category'
+                  dataKey='yAxisName'
+                  interval={0}
+                  angle={-45}
+                  textAnchor='end'
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey='enrollments' fill='#4B66F1' />
+              </BarChart>
+            ) : (
+              <NoDataFoundComponent sx={{pt: 5, justifyContent: 'center'}} />
+            )}
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+    </StyledBox>
+  );
+};
+
+export default CourseEnrolmentChart;

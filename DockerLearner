@@ -1,0 +1,23 @@
+FROM node:14
+
+# Install Yarn
+# RUN curl -o- -L https://yarnpkg.com/install.sh | bash
+
+# Create app directory
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+# Copy app dependency files
+COPY package.json yarn.lock /tmp/
+
+# Install packages and link to tmp file
+RUN cd /tmp && yarn -g
+RUN cd /usr/src/app && ln -s /tmp/node_modules
+
+# Bundle app source
+COPY . /usr/src/app
+RUN cd /usr/src/app && rm -rf learner/public
+RUN cd /usr/src/app && cp public -R learner/public
+RUN cd /usr/src/app && yarn build:learner-prod
+EXPOSE 3002
+CMD ["yarn", "start:learner"]

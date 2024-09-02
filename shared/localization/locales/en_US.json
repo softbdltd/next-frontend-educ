@@ -1,0 +1,13 @@
+{
+  "applicationManagement.label": "Application Management",
+  "applicationManagement.programTitle": "Program Title (Bengali)",
+  "applicationManagement.programTitle_en": "Program Title (English)",
+  "applicationManagement.courseTitle_en": "Course Name (English)",
+  "applicationManagement.courseTitle": "Course Name",
+  "applicationManagement.course": "Course",
+  "applicationManagement.traineeDetails": "Trainee Details",
+  "applicationManagement.assignBatch": "Assign Batch",
+  "industry_association.assignPermission": "Assign Permission",
+  "applicationManagement.reject": "Reject",
+  "applicationManagement.viewCV": "View CV"
+}

@@ -1,0 +1,13 @@
+{
+  "applicationManagement.label": "আবেদন ব্যবস্থাপনা",
+  "applicationManagement.programTitle": "প্রোগ্রাম টাইটেল (বাংলা)",
+  "applicationManagement.programTitle_en": "প্রোগ্রাম টাইটেল (ইংরেজি)",
+  "applicationManagement.courseTitle": "কোর্স টাইটেল (বাংলা)",
+  "applicationManagement.course": "কোর্স",
+  "applicationManagement.courseTitle_en": "কোর্স টাইটেল (ইংরেজি)",
+  "applicationManagement.traineeDetails": "প্রশিক্ষণার্থীর বিস্তারিত",
+  "applicationManagement.assignBatch": "ব্যাচ বরাদ্দ",
+  "industry_association.assignPermission": "পারমিশন দিন",
+  "applicationManagement.assignedBatch": "বরাদ্দকৃত ব্যাচ",
+  "applicationManagement.viewCV": "সিভি দেখুন"
+}
